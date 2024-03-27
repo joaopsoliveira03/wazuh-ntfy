@@ -1,15 +1,17 @@
+#!/var/ossec/framework/python/bin/python3
+
 import json
 import os
 import sys
 import requests
 
 def main(args):
-  if len(args) < 3:
+  if len(args) < 4:
     print("ERROR: Wrong arguments")
     sys.exit(2)
 
   alert_file_location = args[1]
-  hook_url = args[2]
+  hook_url = args[3]
 
   try:
     with open(alert_file_location) as alert_file:
@@ -17,7 +19,7 @@ def main(args):
 
       alert_level = alert_json['rule']['level']
       description = alert_json['rule'].get('description', 'N/A')
-      agentname = alert_json['agent'].get('name')
+      agentname = alert_json['agent'].get('name', 'N/A')
       timestamp = alert_json['timestamp']
       
       ntfy_level = 1
@@ -38,7 +40,7 @@ def main(args):
         'X-Priority': str(ntfy_level),
       }
       
-      # Convert the date to a more readable format
+      # Convert the date to a more readable format: 2024-03-27T15:45:27.388+0000
       timestamp = timestamp.replace('T', ' ').replace('+0000', '')
 
       data = f'Date: {timestamp}\nAgent: {agentname}\nDescription:{description}'
